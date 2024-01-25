@@ -92,9 +92,10 @@ RUN source /venv/bin/activate && \
 RUN git lfs install && \
     git clone https://huggingface.co/Aitrepreneur/models
 
-# Copy required files
-RUN cp ../pipeline_stable_diffusion_xl_instantid.py ./ && \
-    cp -R ../ip_adapter ./
+# Symlink required files
+RUN ln -s ../pipeline_stable_diffusion_xl_instantid.py pipeline_stable_diffusion_xl_instantid.py && \
+    ln -s ../ip_adapter ip_adapter && \
+    ln -s ../examples examples
 
 # Install Jupyter
 RUN pip3 install -U --no-cache-dir jupyterlab \
