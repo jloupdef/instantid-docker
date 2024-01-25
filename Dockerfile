@@ -83,6 +83,11 @@ RUN source /venv/bin/activate && \
     pip3 install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu118 && \
     deactivate
 
+# Symlink required files
+RUN ln -s ../pipeline_stable_diffusion_xl_instantid.py pipeline_stable_diffusion_xl_instantid.py && \
+    ln -s ../ip_adapter ip_adapter && \
+    ln -s ../examples examples
+
 # Download checkpoints
 RUN source /venv/bin/activate && \
     python3 download_checkpoints.py && \
@@ -91,11 +96,6 @@ RUN source /venv/bin/activate && \
 # Download antelopev2 models from Huggingface
 RUN git lfs install && \
     git clone https://huggingface.co/Aitrepreneur/models
-
-# Symlink required files
-RUN ln -s ../pipeline_stable_diffusion_xl_instantid.py pipeline_stable_diffusion_xl_instantid.py && \
-    ln -s ../ip_adapter ip_adapter && \
-    ln -s ../examples examples
 
 # Install Jupyter
 RUN pip3 install -U --no-cache-dir jupyterlab \
