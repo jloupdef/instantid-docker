@@ -28,6 +28,7 @@ RUN apt update && \
         bash \
         dos2unix \
         git \
+        git-lfs \
         ncdu \
         net-tools \
         openssh-server \
@@ -86,6 +87,14 @@ RUN source /venv/bin/activate && \
 RUN source /venv/bin/activate && \
     python3 download_checkpoints.py && \
     deactivate
+
+# Download antelopev2 models from Huggingface
+RUN git lfs install && \
+    git clone https://huggingface.co/Aitrepreneur/models
+
+# Copy required files
+RUN cp ../pipeline_stable_diffusion_xl_instantid.py ./ && \
+    cp -R ../ip_adapter ./
 
 # Install Jupyter
 RUN pip3 install -U --no-cache-dir jupyterlab \
