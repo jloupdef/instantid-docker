@@ -1,4 +1,5 @@
 import torch
+from diffusers.models import ControlNetModel
 from pipeline_stable_diffusion_xl_instantid import StableDiffusionXLInstantIDPipeline
 from huggingface_hub import hf_hub_download
 
@@ -29,14 +30,14 @@ def fetch_instantid_checkpoints():
     )
 
 
-def fetch_pretrained_model(model_class, model_name, **kwargs):
+def fetch_pretrained_model(model_name, **kwargs):
     """
     Fetches a pretrained model from the HuggingFace model hub.
     """
     max_retries = 3
     for attempt in range(max_retries):
         try:
-            return model_class.from_pretrained(model_name, **kwargs)
+            return StableDiffusionXLInstantIDPipeline.from_pretrained(model_name, **kwargs)
         except OSError as err:
             if attempt < max_retries - 1:
                 print(
@@ -49,12 +50,14 @@ def get_instantid_pipeline():
     """
     Fetches the InstantID pipeline from the HuggingFace model hub.
     """
-    common_args = {
-        'torch_dtype': torch.float16,
+    torch_dtype = torch.float16
+
+    args = {
+        'controlnet': ControlNetModel.from_pretrained('./checkpoints/ControlNetModel', torch_dtype=torch_dtype),
+        'torch_dtype': torch_dtype,
     }
 
-    pipeline = fetch_pretrained_model(StableDiffusionXLInstantIDPipeline,
-                                       'wangqixun/YamerMIX_v8', **common_args)
+    pipeline = fetch_pretrained_model('wangqixun/YamerMIX_v8', **args)
 
     return pipeline
 
