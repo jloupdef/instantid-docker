@@ -77,7 +77,7 @@ RUN git clone https://github.com/InstantID/InstantID.git && \
 
 # Install the dependencies for InstantID
 WORKDIR /InstantID/gradio_demo
-COPY --chmod=755 instantid/* ./
+COPY instantid/* ./
 RUN source /venv/bin/activate && \
     pip3 install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu118 && \
     deactivate
