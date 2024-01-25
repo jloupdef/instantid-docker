@@ -82,6 +82,11 @@ RUN source /venv/bin/activate && \
     pip3 install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu118 && \
     deactivate
 
+# Download checkpoints
+RUN source /venv/bin/activate && \
+    python3 download_checkpoints.py && \
+    deactivate
+
 # Install Jupyter
 RUN pip3 install -U --no-cache-dir jupyterlab \
         jupyterlab_widgets \
