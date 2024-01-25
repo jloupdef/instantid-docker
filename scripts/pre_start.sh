@@ -53,7 +53,6 @@ then
     echo "   python3 app.py"
 else
     echo "Starting InstantID"
-    export HF_HOME="/workspace"
     source /workspace/venv/bin/activate
     cd /workspace/InstantID/gradio_demo
     export GRADIO_SERVER_NAME="0.0.0.0"
