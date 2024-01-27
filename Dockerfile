@@ -76,28 +76,23 @@ RUN git clone https://github.com/radames/InstantID.git -b improve-demo-lcm-contr
     cd /InstantID && \
     git checkout ${INSTANTID_COMMIT}
 
+
 # Install the dependencies for InstantID
 WORKDIR /InstantID/gradio_demo
-COPY instantid/* ./
+COPY instantid/requirements.txt ./
 RUN source /venv/bin/activate && \
     pip3 install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu118 && \
     deactivate
+
+COPY instantid/* ./
 
 # Symlink required files
 RUN ln -s ../pipeline_stable_diffusion_xl_instantid.py pipeline_stable_diffusion_xl_instantid.py && \
     ln -s ../ip_adapter ip_adapter && \
     ln -s ../examples examples
 
-RUN wget https://civitai.com/api/download/models/288982?type=Model&format=SafeTensor&size=full&fp=fp16 -o /InstantID/juggernautV8.safetensors
 
-# Download checkpoints
-RUN source /venv/bin/activate && \
-    python3 download_checkpoints.py && \
-    deactivate
-
-# Download antelopev2 models from Huggingface
-RUN git lfs install && \
-    git clone https://huggingface.co/Aitrepreneur/models
+RUN git lfs install
 
 # Install Jupyter
 RUN pip3 install -U --no-cache-dir jupyterlab \
@@ -105,6 +100,11 @@ RUN pip3 install -U --no-cache-dir jupyterlab \
         ipykernel \
         ipywidgets \
         gdown
+
+RUN source /venv/bin/activate && \
+    pip3 install controlnet-aux && \
+    deactivate
+
 
 # Install rclone
 RUN curl https://rclone.org/install.sh | bash

@@ -12,13 +12,20 @@ else
 fi
 
 sync_apps() {
+    mkdir -p /workspace
     # Sync venv to workspace to support Network volumes
     echo "Syncing venv to workspace, please wait..."
-    rsync --remove-source-files -rlptDu /venv/ /workspace/venv/
+    #rsync --remove-source-files -rlptDu /venv/ /workspace/venv/
 
     # Sync InstantID to workspace to support Network volumes
     echo "Syncing InstantID to workspace, please wait..."
-    rsync --remove-source-files -rlptDu /InstantID/ /workspace/InstantID/
+    cp -rf /InstantID /workspace/
+
+    # Create symbolic link from workspace to huggingface cache
+    mkdir -p /workspace/.hf_cache ~/.cache
+    unlink ~/.cache/hugging_face  || true
+    rm -rf ~/.cache/hugging_face
+    ln -s /workspace/.hf_cache/ ~/.cache/hugging_face
 
     echo "${TEMPLATE_VERSION}" > /workspace/template_version
 }
@@ -32,7 +39,7 @@ fix_venvs() {
 if [ "$(printf '%s\n' "$EXISTING_VERSION" "$TEMPLATE_VERSION" | sort -V | head -n 1)" = "$EXISTING_VERSION" ]; then
     if [ "$EXISTING_VERSION" != "$TEMPLATE_VERSION" ]; then
         sync_apps
-        fix_venvs
+        #fix_venvs
 
         # Create directories
         mkdir -p /workspace/logs /workspace/tmp
@@ -53,11 +60,11 @@ then
     echo "   python3 app.py"
 else
     echo "Starting InstantID"
-    source /workspace/venv/bin/activate
+    source /venv/bin/activate
     cd /workspace/InstantID/gradio_demo
     export GRADIO_SERVER_NAME="0.0.0.0"
     export GRADIO_SERVER_PORT="3001"
-    nohup python3 app.py > /workspace/logs/InstantID.log 2>&1 &
+    nohup python3 app-ControlnetPose.py --pretrained_model_name_or_path /workspace/models/juggernautV8.safetensors > /workspace/logs/InstantID.log 2>&1 &
     echo "InstantID started"
     echo "Log file: /workspace/logs/InstantID.log"
     deactivate

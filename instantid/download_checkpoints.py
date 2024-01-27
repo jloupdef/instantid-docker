@@ -12,21 +12,21 @@ def fetch_instantid_checkpoints():
         repo_id='InstantX/InstantID',
         filename='ControlNetModel/config.json',
         local_dir='./checkpoints',
-        local_dir_use_symlinks=False
+        #local_dir_use_symlinks=False
     )
 
     hf_hub_download(
         repo_id='InstantX/InstantID',
         filename='ControlNetModel/diffusion_pytorch_model.safetensors',
         local_dir='./checkpoints',
-        local_dir_use_symlinks=False
+        #local_dir_use_symlinks=False
     )
 
     hf_hub_download(
         repo_id='InstantX/InstantID',
         filename='ip-adapter.bin',
         local_dir='./checkpoints',
-        local_dir_use_symlinks=False
+        #local_dir_use_symlinks=False
     )
 
 
@@ -46,21 +46,6 @@ def fetch_pretrained_model(model_name, **kwargs):
                 raise
 
 
-def get_instantid_pipeline():
-    """
-    Fetches the InstantID pipeline from the HuggingFace model hub.
-    """
-    torch_dtype = torch.float16
-
-    pipeline = StableDiffusionXLInstantIDPipeline.from_pretrained('/InstantID/juggernautV8.safetensors',
-                torch_dtype=torch_dtype,
-                use_safetensors=True,
-                ControlNetModel.from_pretrained('./checkpoints/ControlNetModel', torch_dtype=torch_dtype)),
-
-    return pipeline
-
-
 if __name__ == "__main__":
     fetch_instantid_checkpoints()
-    get_instantid_pipeline()
 

@@ -134,6 +134,31 @@ EOF
     fi
 }
 
+
+preload_models() {
+
+    mkdir -p /workspace/models
+    if [ ! -f /workspace/models/juggernautV8.safetensors ]; then
+        wget -O /workspace/models/juggernautV8.safetensors "https://civitai.com/api/download/models/288982?type=Model&format=SafeTensor&size=full&fp=fp16"
+    fi
+
+    cd /workspace/InstantID/gradio_demo
+
+    if [ ! -f /workspace/InstantID/gradio_demo/checkpoints/ip-adapter.bin ]; then
+        # Download checkpoints
+        source /venv/bin/activate && \
+        python3 download_checkpoints.py && \
+        deactivate
+    fi
+
+    # Download antelopev2 models from Huggingface
+
+    if [ ! -d models ]; then
+        git clone https://huggingface.co/Aitrepreneur/models
+    fi
+
+}
+
 # ---------------------------------------------------------------------------- #
 #                               Main Program                                   #
 # ---------------------------------------------------------------------------- #
@@ -141,6 +166,7 @@ EOF
 echo "Container Started, configuration in progress..."
 start_nginx
 execute_script "/pre_start.sh" "Running pre-start script..."
+preload_models
 setup_ssh
 configure_filezilla
 start_jupyter
