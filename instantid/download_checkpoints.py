@@ -52,12 +52,10 @@ def get_instantid_pipeline():
     """
     torch_dtype = torch.float16
 
-    args = {
-        'controlnet': ControlNetModel.from_pretrained('./checkpoints/ControlNetModel', torch_dtype=torch_dtype),
-        'torch_dtype': torch_dtype,
-    }
-
-    pipeline = fetch_pretrained_model('wangqixun/YamerMIX_v8', **args)
+    pipeline = StableDiffusionXLInstantIDPipeline.from_pretrained('/InstantID/juggernautV8.safetensors',
+                torch_dtype=torch_dtype,
+                use_safetensors=True,
+                ControlNetModel.from_pretrained('./checkpoints/ControlNetModel', torch_dtype=torch_dtype)),
 
     return pipeline
 

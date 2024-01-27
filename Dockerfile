@@ -1,7 +1,7 @@
 # Stage 1: Base
 FROM nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04 as base
 
-ARG INSTANTID_COMMIT=7aff17e68da11774703619d5991b99796a29e202
+ARG INSTANTID_COMMIT=691462453d37481e17f5eed552d612e66e18fa84
 ARG TORCH_VERSION=2.0.1
 ARG XFORMERS_VERSION=0.0.22
 
@@ -72,7 +72,7 @@ RUN source /venv/bin/activate && \
 
 # Clone the git repo of InstantID and set version
 WORKDIR /
-RUN git clone https://github.com/InstantID/InstantID.git && \
+RUN git clone https://github.com/radames/InstantID.git -b improve-demo-lcm-controlnet && \
     cd /InstantID && \
     git checkout ${INSTANTID_COMMIT}
 
@@ -87,6 +87,8 @@ RUN source /venv/bin/activate && \
 RUN ln -s ../pipeline_stable_diffusion_xl_instantid.py pipeline_stable_diffusion_xl_instantid.py && \
     ln -s ../ip_adapter ip_adapter && \
     ln -s ../examples examples
+
+RUN wget https://civitai.com/api/download/models/288982?type=Model&format=SafeTensor&size=full&fp=fp16 -o /InstantID/juggernautV8.safetensors
 
 # Download checkpoints
 RUN source /venv/bin/activate && \
