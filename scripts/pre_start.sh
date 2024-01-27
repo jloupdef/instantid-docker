@@ -19,7 +19,7 @@ sync_apps() {
 
     # Sync InstantID to workspace to support Network volumes
     echo "Syncing InstantID to workspace, please wait..."
-    cp -rf /InstantID /workspace/
+    cp -rf /InstantID /workspace/InstantID
 
     # Create symbolic link from workspace to huggingface cache
     mkdir -p /workspace/.hf_cache ~/.cache
@@ -36,6 +36,27 @@ fix_venvs() {
     /fix_venv.sh /venv /workspace/venv
 }
 
+preload_models() {
+
+    mkdir -p /workspace/models
+    wget -c -O /workspace/models/juggernautV8.safetensors "https://civitai.com/api/download/models/288982?type=Model&format=SafeTensor&size=full&fp=fp16"
+
+    cd /workspace/InstantID/gradio_demo
+
+    if [ ! -f /workspace/InstantID/gradio_demo/checkpoints/ip-adapter.bin ]; then
+        # Download checkpoints
+        source /venv/bin/activate && \
+        python3 download_checkpoints.py && \
+        deactivate
+    fi
+
+    # Download antelopev2 models from Huggingface
+
+    if [ ! -d models/antelopev2 ]; then
+        git clone https://huggingface.co/Aitrepreneur/models
+    fi
+
+}
 if [ "$(printf '%s\n' "$EXISTING_VERSION" "$TEMPLATE_VERSION" | sort -V | head -n 1)" = "$EXISTING_VERSION" ]; then
     if [ "$EXISTING_VERSION" != "$TEMPLATE_VERSION" ]; then
         sync_apps
@@ -59,6 +80,8 @@ then
     echo "   export GRADIO_SERVER_PORT=\"3001\""
     echo "   python3 app.py"
 else
+    echo "Preloading models"
+    preload_models
     echo "Starting InstantID"
     source /venv/bin/activate
     cd /workspace/InstantID/gradio_demo
